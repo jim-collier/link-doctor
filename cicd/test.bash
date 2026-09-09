@@ -14,7 +14,7 @@
 ##		- Set CICDTEST_DO_LONGTEST=1 for the larger, exhaustive tree.
 ##	History: At bottom of script.
 
-##	Copyright © 2026 Jim Collier (ID: 1cv◂‡Vᛦ)
+##	Copyright © 2026 Jim Collier [ID: 2უNაɘ«҂թȹɤξπ๙¿ձϖ]
 ##	Licensed under the GNU General Public License v2.0 or later. Full text at:
 ##		https://spdx.org/licenses/GPL-2.0-or-later.html
 ##	SPDX-License-Identifier: GPL-2.0-or-later
