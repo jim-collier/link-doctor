@@ -32,6 +32,186 @@ This is a product backlog just for pre-v1.0.0 release. After that, bugs, feature
 
 ## Issues
 
+- Build and test in a pinned container.
+	- ID: 2026101303344551
+	- Type: Enhancement
+	- Status: Queued
+	- Priority [Feature|Enhancement] | Severity [Bug]: High
+	- Opened: 20261013-033445
+	- Opened by: JC
+	- Target OS: Linux
+	- Requirements [Feature]:
+		- `cicd.bash --container` runs the build and test stages in an image built from a pinned recipe in `cicd/container/`. Toolchains come from pinned downloads with checksums.
+		- Toolchains on the build box clash between projects, such as 2 Zig versions on one link. A container keeps this project's pins apart.
+		- Other test boxes stay native, since their OS is what's being tested.
+		- zuid's `--container` stage is the model. gitsby and convert-base-v2 have one too.
+		- 2026-10-24: this is the CICD reset's containers item now. Build and test run in the container by default, and `--no-container` runs them on the host, in place of an opt-in `--container`. A missing docker or an image that won't build falls back to the host with one line saying so, and never fails the run. Priority raised from Low.
+		- Sweeping override, 2026-10-24: this supersedes any earlier decision on this project that conflicts with it.
+		- It overrides the opt-in `--container` flag above.
+
+- CICD reset: other hosts and VMs
+	- ID: 2026102416310500
+	- Type: Enhancement
+	- Status: Queued
+	- Needs external testing: Yes, on the Windows, macOS, and arm64 Linux test boxes.
+	- Priority [Feature|Enhancement] | Severity [Bug]: High
+	- Opened: 20261024-163105
+	- Opened by: JC
+	- Requirements [Feature]:
+		- Sweeping override, 2026-10-24: this supersedes any earlier decision on this project that conflicts with it.
+		- It covers the old item to verify the Windows paths on real Windows hardware.
+		- The default run tests the Windows, Intel macOS, and arm64 Linux builds on the test boxes, and FreeBSD once it's built. `--no-remote` skips them.
+		- Windows tests go to b29w first, and to vm925w only for GPU or timed work. Symlink and junction checks there need a user that can make symlinks.
+		- Each box is held through the shared host lock while it's in use. A VM is put back the way it was found, through the VM state helper.
+		- A box that isn't there shows as SKIP with a warning, and the run goes on.
+		- Each box gets a work folder for this project under its temp root.
+
+- CICD reset: container cleanup
+	- ID: 2026102416310501
+	- Type: Enhancement
+	- Status: Queued
+	- Priority [Feature|Enhancement] | Severity [Bug]: High
+	- Opened: 20261024-163105
+	- Opened by: JC
+	- Prereq IDs: 2026101303344551
+	- Requirements [Feature]:
+		- Sweeping override, 2026-10-24: this supersedes any earlier decision on this project that conflicts with it.
+		- Every container, image, and volume the pipeline makes gets the `dev.project` and `dev.run` labels. Containers are named by project, run, and step.
+		- Containers run with `--rm` unless `--keep-temp` is passed.
+		- At the end of a run, on failure and Ctrl+C too, the run's containers are removed by label. Then the project's dangling images, and its older tags once a newer one passed, keeping the current tag and the one before.
+		- Then `docker builder prune -f --filter until=168h`. Cache volumes are kept under 2 GB.
+		- Nothing without this project's label is touched. No `docker rmi -f` and no `docker system prune`.
+
+- CICD reset: CPU and priority
+	- ID: 2026102416310502
+	- Type: Enhancement
+	- Status: Queued
+	- Priority [Feature|Enhancement] | Severity [Bug]: High
+	- Opened: 20261024-163105
+	- Opened by: JC
+	- Requirements [Feature]:
+		- Sweeping override, 2026-10-24: this supersedes any earlier decision on this project that conflicts with it.
+		- Build and test use at most half the CPUs, or a quarter on a busy box. Busy means the 1-minute load is over half the CPU count, checked at the start and before each step. Nothing caps them now.
+		- Fuzzing and leak checks use a quarter, busy or not.
+		- The counts are worked out in one place and passed to every tool that runs in parallel, such as `GOMAXPROCS`, `go test -p`, and `-parallel`.
+		- Every step runs under `nice -n 19` and `ionice -c 3`. Containers get `--cpus` and `--cpu-shares 256`.
+		- Other hosts follow the same rules with their own CPU count and load.
+
+- CICD reset: standard flags
+	- ID: 2026102416310503
+	- Type: Enhancement
+	- Status: Queued
+	- Priority [Feature|Enhancement] | Severity [Bug]: High
+	- Opened: 20261024-163105
+	- Opened by: JC
+	- Requirements [Feature]:
+		- Sweeping override, 2026-10-24: this supersedes any earlier decision on this project that conflicts with it.
+		- `cicd.bash` takes the shared flags: `--quiet` and `-q`, `--message` and `-m`, `--slow` as another name for `--long`, `--leakcheck`, `--no-leakcheck`, `--backlog-run-quick` with optional areas, `--backlog-run-full`, `--merge-gate`, `--no-container`, `--no-remote`, `--no-sync`, `--keep-temp`, and `--list`. `--gate` and `--ci` are other names for the quick backlog run and the merge gate. The existing flags stay.
+		- `--long` runs everything, and a plain run takes no more than about an hour. `--quick` runs what's fast in about 10 minutes, and skips only the cross-builds now.
+		- The backlog runs and the merge gate never dogfood, publish, commit, push, install, sync, or rewrite a tracked file, and never prompt.
+		- A pre-push hook runs `--merge-gate` on a push to main. It skips the gate when the commits touch only docs and the other paths listed in one place.
+		- No gate on other pushes. There's no dev branch yet.
+
+- CICD reset: step output
+	- ID: 2026102416310504
+	- Type: Enhancement
+	- Status: Queued
+	- Priority [Feature|Enhancement] | Severity [Bug]: High
+	- Opened: 20261024-163105
+	- Opened by: JC
+	- Requirements [Feature]:
+		- Sweeping override, 2026-10-24: this supersedes any earlier decision on this project that conflicts with it.
+		- Each step prints a 79-character rule, a `Starting` line, its output, and a `PASS` or `FAIL` line, in the shared format with a full local timestamp and "Step N of M".
+		- One blank line between steps, and one at the end.
+		- Steps turned off aren't counted. The first section lists them with the flag or reason for each.
+		- The stage headers read "1/6 Format" with a time of day now, under a shorter rule.
+
+- CICD reset: a test for every Done item
+	- ID: 2026102416310505
+	- Type: Enhancement
+	- Status: Queued
+	- Priority [Feature|Enhancement] | Severity [Bug]: High
+	- Opened: 20261024-163105
+	- Opened by: JC
+	- Requirements [Feature]:
+		- Sweeping override, 2026-10-24: this supersedes any earlier decision on this project that conflicts with it.
+		- Every Done feature and bug gets a regression test in CI, where one makes sense, and names its test ID. Otherwise it says in a few words why it has none.
+		- None of the Done items name a test yet.
+
+- CICD reset: test IDs
+	- ID: 2026102416310506
+	- Type: Enhancement
+	- Status: Queued
+	- Priority [Feature|Enhancement] | Severity [Bug]: High
+	- Opened: 20261024-163105
+	- Opened by: JC
+	- Requirements [Feature]:
+		- Sweeping override, 2026-10-24: this supersedes any earlier decision on this project that conflicts with it.
+		- Every CI test gets a unique ID: its creation time in whole minutes since 2000-01-01 UTC, in lowercase Crockford base 32. Take the time from the test's first commit, or the nearest evidence. An ID never changes.
+		- The run prints one `PASS`, `FAIL`, or `SKIP` line per regression and fuzz test, with its ID and name. The harness prints `ok` with a label now, and `go test ./...` counts as one check.
+
+- CICD reset: temp files and safe removal
+	- ID: 2026102416310507
+	- Type: Enhancement
+	- Status: Queued
+	- Priority [Feature|Enhancement] | Severity [Bug]: Avg
+	- Opened: 20261024-163105
+	- Opened by: JC
+	- Requirements [Feature]:
+		- Sweeping override, 2026-10-24: this supersedes any earlier decision on this project that conflicts with it.
+		- Each run makes its own folder under `${HOST_TEMP}/<project>/`, named by time and a counter, and points `TMPDIR`, `TEMP`, and `TMP` at it. The harness's scratch trees go inside it.
+		- A trap removes it at the end, on failure and Ctrl+C too. `--keep-temp` keeps it and prints the path.
+		- Each run also removes this project's stale run folders, older than 2 days with no live process from their `run.pid`.
+		- Recursive removes go through the repo's own copy of the safe removal guard, or one that names the one parent it may remove under, such as the Makefile's `dist`. File list in the private notes.
+
+- CICD reset: version line
+	- ID: 2026102416310508
+	- Type: Enhancement
+	- Status: Queued
+	- Priority [Feature|Enhancement] | Severity [Bug]: Avg
+	- Opened: 20261024-163105
+	- Opened by: JC
+	- Requirements [Feature]:
+		- Sweeping override, 2026-10-24: this supersedes any earlier decision on this project that conflicts with it.
+		- `--version` prints `<program name> v<version> build <build>`, then the copyright line. It prints the bare `git describe` output now.
+		- The build number is the commit time in minutes since 2000, in lowercase Crockford base 32, so builds stay reproducible.
+		- A non-release build adds its build date after the build number. Release builds leave it off.
+		- The version and the tag come from one place.
+
+- CICD reset: macOS runner
+	- ID: 2026102416310509
+	- Type: Enhancement
+	- Status: Queued
+	- Priority [Feature|Enhancement] | Severity [Bug]: Avg
+	- Opened: 20261024-163105
+	- Opened by: JC
+	- Target OS: macOS
+	- Requirements [Feature]:
+		- Sweeping override, 2026-10-24: this supersedes any earlier decision on this project that conflicts with it.
+		- A hosted workflow on GitHub's free arm64 macOS runner builds, runs the tests, and smoke-tests the CLI on the built binary, without a GUI.
+		- Pick which flags start it, by how long it takes.
+
+- CICD reset: CICD process gaps
+	- ID: 2026102416310510
+	- Type: Enhancement
+	- Status: Queued
+	- Priority [Feature|Enhancement] | Severity [Bug]: Avg
+	- Opened: 20261024-163105
+	- Opened by: JC
+	- Requirements [Feature]:
+		- Sweeping override, 2026-10-24: this supersedes any earlier decision on this project that conflicts with it.
+		- What's left of the shared CICD rules after the other reset items:
+			- No fetch and fast-forward before the build.
+			- No lint stage, no lint output under `cicd/artifacts/lint/`, and no lint `--check` gate.
+			- No race detector, goleak, staticcheck, govulncheck, soak test, or CodeQL.
+			- No profiler stage or flame report.
+			- No FreeBSD build, no `.deb`, `.rpm`, or FreeBSD `.pkg`, no Windows installer, and no checksums file.
+			- No pinned tool versions.
+			- A "Proceed?" prompt in place of the commit message prompt.
+			- Its own output helpers in place of the `fEcho` family.
+			- No demo gif.
+			- No end-of-run line saying what cleanup removed and freed.
+
 - Run on the last Core 2 Duo, and AMD CPUs from that era.
 	- ID: 2026101301161865
 	- Type: Enhancement
@@ -49,20 +229,6 @@ This is a product backlog just for pre-v1.0.0 release. After that, bugs, feature
 		- Tests run the release build on an emulated Penryn and Phenom II, through Intel SDE or QEMU's `-cpu Penryn` and `-cpu phenom`.
 	- Progress log:
 		- 20261013: Go builds for plain x86-64 by default (`GOAMD64=v1`), and nothing here sets it, so this may already hold. Pin `GOAMD64=v1` in the release build so a stray environment can't raise it. The standard library already picks faster code at run time.
-
-- Build and test in a pinned container.
-	- ID: 2026101303344551
-	- Type: Enhancement
-	- Status: Queued
-	- Priority [Feature|Enhancement] | Severity [Bug]: Low
-	- Opened: 20261013-033445
-	- Opened by: JC
-	- Target OS: Linux
-	- Requirements [Feature]:
-		- `cicd.bash --container` runs the build and test stages in an image built from a pinned recipe in `cicd/container/`. Toolchains come from pinned downloads with checksums.
-		- Toolchains on the build box clash between projects, such as 2 Zig versions on one link. A container keeps this project's pins apart.
-		- Other test boxes stay native, since their OS is what's being tested.
-		- zuid's `--container` stage is the model. gitsby and convert-base-v2 have one too.
 
 ## Old format
 
