@@ -7,14 +7,14 @@
 
 ![Go](https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=white)
 ![License: GPL v2](https://img.shields.io/badge/License-GPLv2-blue.svg)
-![Lifecycle](https://img.shields.io/badge/Lifecycle-Alpha-orange)
+![Lifecycle](https://img.shields.io/badge/Lifecycle-Beta-yellow)
 ![Support](https://img.shields.io/badge/Support-Maintained-brightgreen)
 ![Status: Passing](https://img.shields.io/badge/Status-Passing-brightgreen)
 
 </div>
 
 <!-- TOC ignore:true -->
-# repoint-symlink
+# Link Doctor
 
 Find symlinks anywhere under a folder and rewrite where they point. Filter which links to touch with any number of include/exclude regexes and name globs, then edit their targets with a regex-and-template substitution. Linux, macOS, and Windows; on Windows it also handles NTFS junctions and `.lnk` shortcuts.
 
@@ -37,7 +37,7 @@ Find symlinks anywhere under a folder and rewrite where they point. Filter which
 
 ## Why
 
-Moving a directory, renaming a mount, or restructuring a tree leaves a scatter of symlinks pointing at the old location. Fixing them by hand is tedious and error-prone. `repoint-symlink` finds them all and repoints them in one pass - with an optional dry run to check first.
+Moving a directory, renaming a mount, or restructuring a tree leaves a scatter of symlinks pointing at the old location. Fixing them by hand is tedious and error-prone. `link-doctor` finds them all and repoints them in one pass - with an optional dry run to check first.
 
 ## Features
 
@@ -74,7 +74,7 @@ Moving a directory, renaming a mount, or restructuring a tree leaves a scatter o
 ## Usage
 
 ```bash
-repoint-symlink [START] [FROM] [TO] [options]
+link-doctor [START] [FROM] [TO] [options]
 ```
 
 `START`, `FROM`, and `TO` may be given positionally (in that order) or as `--from` / `--to`. With no `--from`, matching links are just listed. Run with no arguments at all to print this help (pass `.` explicitly to list the current directory).
@@ -139,43 +139,43 @@ Globs vs regexes:
 
 ```sh
 # Preview repointing every symlink under /srv that points into /mnt/old
-repoint-symlink /srv --from='/mnt/old' --to='/mnt/new' -n
+link-doctor /srv --from='/mnt/old' --to='/mnt/new' -n
 
 # Do it for real
-repoint-symlink /srv --from='/mnt/old' --to='/mnt/new'
+link-doctor /srv --from='/mnt/old' --to='/mnt/new'
 
 # Only *.conf links, skip anything under a 'backup' dir
-repoint-symlink . --iname='*.conf' --exc='/backup/' --from='v1' --to='v2'
+link-doctor . --iname='*.conf' --exc='/backup/' --from='v1' --to='v2'
 
 # Whole-path glob (find style): links anywhere under an 'etc' dir
-repoint-symlink / --wholename='*/etc/*'
+link-doctor / --wholename='*/etc/*'
 
 # Only links that currently point into /mnt/old (by target, not by their own path)
-repoint-symlink /srv --inc-target='^/mnt/old/' --from='/mnt/old' --to='/mnt/new'
+link-doctor /srv --inc-target='^/mnt/old/' --from='/mnt/old' --to='/mnt/new'
 
 # Drop every .tmp link, then rescue the ones under an 'assets' dir
-repoint-symlink /srv --exc='\.tmp$' --re-inc='/assets/.*\.tmp$'
+link-doctor /srv --exc='\.tmp$' --re-inc='/assets/.*\.tmp$'
 
 # Regex capture: /opt/app-1.2.3 -> /opt/app/1.2.3
-repoint-symlink /srv --from='/opt/app-(\d+\.\d+\.\d+)' --to='/opt/app/$1'
+link-doctor /srv --from='/opt/app-(\d+\.\d+\.\d+)' --to='/opt/app/$1'
 
 # Literal replace (no regex) - handy for Windows paths
-repoint-symlink . -F --from='C:\Old' --to='C:\New'
+link-doctor . -F --from='C:\Old' --to='C:\New'
 
 # List every symlink two levels deep
-repoint-symlink /srv --max-depth=2
+link-doctor /srv --max-depth=2
 
 # Follow directory symlinks while searching (loop-safe)
-repoint-symlink /srv -L --from='/mnt/old' --to='/mnt/new'
+link-doctor /srv -L --from='/mnt/old' --to='/mnt/new'
 
 # Machine-readable listing piped to another tool
-repoint-symlink /srv --inc='/a/' -0 | xargs -0 -n1 ls -l
+link-doctor /srv --inc='/a/' -0 | xargs -0 -n1 ls -l
 
 # Convert absolute symlink targets to relative (no --from needed)
-repoint-symlink /srv --renormal-relative
+link-doctor /srv --renormal-relative
 
 # Review the whole plan and confirm before anything is written
-repoint-symlink /srv --from='/mnt/old' --to='/mnt/new' --confirm
+link-doctor /srv --from='/mnt/old' --to='/mnt/new' --confirm
 ```
 
 ## Installing
@@ -188,7 +188,7 @@ Requires Go (see `.go-version`).
 
 ```sh
 cd source
-make local      # native build -> ./repoint-symlink
+make local      # native build -> ./link-doctor
 make test       # go test ./...
 make release    # cross-compile every platform into ./dist
 ```

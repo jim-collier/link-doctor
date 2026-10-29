@@ -53,7 +53,7 @@ The CLI is `package main` under `source/`; the selection engine is a standalone 
 Command line only:
 
 ```
-repoint-symlink [START] [FROM] [TO] [options]
+link-doctor [START] [FROM] [TO] [options]
 ```
 
 See `README.md` for the full flag list. `START`/`FROM`/`TO` are positional aliases for the start folder, `--from`, and `--to`.

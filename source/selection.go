@@ -5,7 +5,7 @@
 
 package main
 
-import "github.com/jim-collier/repoint-symlink/filter"
+import "github.com/jim-collier/link-doctor/filter"
 
 // compileFilters maps the parsed selection flags onto the reusable filter
 // engine. The pipeline semantics live in package filter; here we only translate

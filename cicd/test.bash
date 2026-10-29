@@ -7,7 +7,7 @@
 #  shellcheck disable=2181
 
 ##	Purpose:
-##		- Test harness for repoint-symlink. Runs the Go unit tests, then drives the
+##		- Test harness for link-doctor. Runs the Go unit tests, then drives the
 ##		  built binary against scratch symlink trees and asserts the results.
 ##		- Binary under test: $CICDTEST_EXE if set (the cicd engine sets it to the
 ##		  staged build); otherwise 'make -C source local' is built and used.
@@ -41,7 +41,7 @@ EXE="${CICDTEST_EXE:-}"
 if [[ -z "${EXE}" ]]; then
 	section "Building binary under test"
 	make -C "${srcdir}" local >/dev/null || die "build failed"
-	EXE="${srcdir}/repoint-symlink"
+	EXE="${srcdir}/link-doctor"
 fi
 [[ -x "${EXE}" ]] || die "binary not executable: ${EXE}"
 

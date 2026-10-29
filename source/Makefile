@@ -1,4 +1,4 @@
-BINARY := repoint-symlink
+BINARY := link-doctor
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS := -s -w -X main.version=$(VERSION)
 
@@ -15,7 +15,7 @@ PLATFORMS := \
 
 .PHONY: all local release clean test vet fmt
 
-# Default: build for the current machine into ./repoint-symlink
+# Default: build for the current machine into ./link-doctor
 all: local
 
 local:
