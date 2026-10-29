@@ -8,7 +8,7 @@ package main
 import (
 	"testing"
 
-	"github.com/jim-collier/repoint-symlink/filter"
+	"github.com/jim-collier/link-doctor/filter"
 )
 
 // specFor must translate each flag kind to the right op / glob / basename / fold.

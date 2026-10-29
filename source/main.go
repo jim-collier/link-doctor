@@ -14,7 +14,7 @@ import (
 var version = "dev"
 
 const (
-	appName = "repoint-symlink"
+	appName = "link-doctor"
 	author  = "Jim Collier [ID: 2უNაɘ«҂թȹɤξπ๙¿ձϖ]"
 )
 

@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jim-collier/repoint-symlink/filter"
+	"github.com/jim-collier/link-doctor/filter"
 )
 
 // The fuzz targets below run their seed corpus during a normal 'go test', which

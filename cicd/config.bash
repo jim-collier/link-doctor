@@ -8,7 +8,7 @@
 #  shellcheck disable=2155  ## 'Declare and assign separately to avoid masking return values.' Cumbersome and unnecessary.
 
 ##	Purpose:
-##		- Project-specific CI/CD settings for repoint-symlink.
+##		- Project-specific CI/CD settings for link-doctor.
 ##		- The engine (cicd.bash) stays generic; everything project-specific lives here.
 ##		- To reuse the pipeline elsewhere, copy the cicd/ directory and edit this file.
 ##		- All command arrays run from the repo root (the cicd/.. directory). This is a Go
@@ -27,8 +27,8 @@ declare -i isSourced_t6wqf=0; [[ "${BASH_SOURCE[0]}" == "${0}" ]] || isSourced_t
 
 
 ## Identity
-APP_NAME="repoint-symlink"
-EXE_NAME="repoint-symlink"
+APP_NAME="link-doctor"
+EXE_NAME="link-doctor"
 
 ## Where the Go sources and Makefile live, relative to the repo root.
 SRC_DIR="source"
@@ -88,5 +88,5 @@ GIT_PUBLISH=(cicd/utility/n8git_backup-and-publish)
 
 
 ##	History:
-##		- 2026-07-04 JC: Created for repoint-symlink (generic engine + config split, adapted from the sister project).
+##		- 2026-07-04 JC: Created for link-doctor (generic engine + config split, adapted from the sister project).
 ##		- 2026-07-06 JC: OS-aware dogfood destinations (Linux/macOS/Windows) selected by uname.
