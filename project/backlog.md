@@ -212,6 +212,65 @@ This is a product backlog just for pre-v1.0.0 release. After that, bugs, feature
 			- No demo gif.
 			- No end-of-run line saying what cleanup removed and freed.
 
+- Rework the command line: fewer, clearer flags.
+	- ID: 2026102819042523
+	- Type: Enhancement
+	- Status: Queued
+	- Needs local test suite run?: Yes
+	- Priority [Feature|Enhancement] | Severity [Bug]: High
+	- Opened: 20261028-190425
+	- Opened by: JC
+	- Related IDs: 2026102819042524, 2026102819042525
+	- Requirements [Feature]:
+		- Only START is positional. The FROM and TO positionals go.
+		- `--match-regex REGEX` and `--match-wild PATTERN` replace `--from` and `-F`. One or the other, not both. Wildcards are `*` and `?` and can't capture, so with `--match-wild` the replacement stands in for the whole match.
+		- `--replace TEMPLATE` replaces `--to`. `$1` and `${name}` work with `--match-regex` only.
+		- `--renorm rel[ative]|abs[olute]` replaces `--renormal-relative` and `--renormal-absolute`. Repeatable, so `canon` (2026102819042524) can go with either. `rel` and `abs` together is an error.
+		- `--find-in[clude] REGEX`, `--find-ex[clude] REGEX`, `--find-target-in[clude] REGEX`, and `--find-target-ex[clude] REGEX` replace `--include`, `--exclude`, `--inc-target`, and `--exc-target`. Each abbreviation is a prefix of exactly one name, so the alias table goes.
+		- `--re-include` and the four glob flags (`--name`, `--iname`, `--wholename`, `--iwholename`) go. Regex lookaround and `(?i)` cover them. With no widener left, rule order no longer matters. The filter package may keep globs and re-add for the file-lister project; the CLI stops exposing them.
+		- `--no-nested[-filesystem]` replaces `--no-cross-device`, same st_dev check. `--xdev` stays as the one alias.
+		- A `--match-wild` value that holds no wildcard and names an existing path under the current directory is an error, since the shell most likely expanded an unquoted glob. Extra positionals after it get the same message, which shows the quoted form.
+		- README, design.md, `test.bash`, the fuzz targets, and `changelog.md` follow. Pre-release, so no aliases for the old spellings.
+
+- Read and write `.lnk` shortcuts on every OS, without COM.
+	- ID: 2026102819042524
+	- Type: Feature
+	- Status: Queued
+	- Needs local test suite run?: Yes
+	- Needs external testing: Yes, a smoke run on vm925w that Explorer opens a rewritten shortcut.
+	- Priority [Feature|Enhancement] | Severity [Bug]: High
+	- Opened: 20261028-190425
+	- Opened by: JC
+	- Prereq IDs: 2026102819042523
+	- Target OS: All
+	- Requirements [Feature]:
+		- A pure Go parser and writer for the Shell Link format replaces the `go-ole` path on Windows too, so one code path runs everywhere and is testable on Linux. `go-ole` leaves `go.mod`.
+		- A shortcut stores its target up to four ways, and each is handled: the LinkInfo local or network path, the relative path, the `%VAR%` environment path, and the item ID list.
+		- `--match-*` rewrites the local, network, and environment paths as text, so `%USERPROFILE%\Old` to `%USERPROFILE%\New` keeps the variable. The relative path is recomputed from the absolute one after every edit, so the two never disagree.
+		- Writing drops the item ID list and clears its flag, since Windows reads it before any path. Strings are written as UTF-16. Extra data blocks unrelated to the target, such as console settings and the icon path, are kept as they were. The volume serial is kept when the drive is the same.
+		- Resolving a shortcut off Windows follows Windows' own order: the environment path, with `USERPROFILE` falling back to `$HOME`; then the local path, where a rooted path with no drive is tried as is, a drive path is placed by volume serial through `/dev/disk/by-uuid` and the mount table, and a UNC path is looked for among mounted SMB shares; then the relative path from the shortcut's folder. Walks are case-insensitive.
+		- nemo-anywhere's `libnemo-private/nemo-lnk.c` is the model, and its test fixtures and `.lnk` fuzz corpus seed this project's, copied by reflink.
+		- A new parse path gets a fuzz target, and the write path a security scenario, per the testing rule in memory.
+
+- `--renorm canon[ical]`: resolve a target like realpath.
+	- ID: 2026102819042525
+	- Type: Feature
+	- Status: Queued
+	- Needs local test suite run?: Yes
+	- Needs external testing: Yes, junctions on vm925w.
+	- Priority [Feature|Enhancement] | Severity [Bug]: Avg
+	- Opened: 20261028-190425
+	- Opened by: JC
+	- Prereq IDs: 2026102819042523
+	- Related IDs: 2026102819042524
+	- Target OS: All
+	- Requirements [Feature]:
+		- `--renorm canon` resolves every symlink in the target and writes the result absolute. With `--renorm rel` as well, it resolves first and then spells the result relative to the link's folder. `rel` and `abs` stay logical-only, as today.
+		- A target that can't be resolved, such as a dangling one, fails that link with a warning, like `realpath -e`.
+		- The help says plainly that this changes where a link to a link points once the middle link moves, which the logical modes never do.
+		- On a `.lnk`, off Windows, the target is resolved per 2026102819042524 and written back as a rooted backslash path with no drive. On Windows it is written as a drive path.
+		- On Windows, `canon` works on junctions, following further junctions and symlinks and rewriting the reparse buffer in place, which needs no elevation. `rel` on a junction warns and skips, since a junction only holds an absolute target. Symlinks still need the privilege or developer mode, and the help says so.
+
 - Make release archives rebuild to their published checksums.
 	- ID: 2026102817592630
 	- Type: Enhancement
@@ -272,6 +331,7 @@ This is a product backlog just for pre-v1.0.0 release. After that, bugs, feature
 ### Features and enhancements
 
 - Verify the Windows paths on real Windows hardware: symlink recreate (file vs dir flag, privilege), junction reparse-buffer write, and `.lnk` `TargetPath` set/save. (Because...built and cross-compiled from Linux.)
+	- 20261028: The `.lnk` part is superseded by 2026102819042524, which replaces the COM path with a pure Go writer. Symlinks and junctions still need the smoke run.
 
 - Use the improved file selection filtering engine defined (and created?) in the section '##### Input selection' of '../rapid-photo-downloader-cli/github/project/design.md'.
 
