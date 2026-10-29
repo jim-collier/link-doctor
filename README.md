@@ -86,17 +86,22 @@ Filters pick which links to act on. Most match the link's own path; `--inc-targe
 How the pipeline reads:
 
 - Every filter flag is one rule.
+
 - Rules run left to right, starting from "all links kept".
+
 - Each flag's effect is fixed, so you read them one at a time.
+
 - Order still matters: a later rule acts on whatever the earlier ones left.
 
 What each kind does:
 
-- **Narrow** - keep only links that also match.
+- **Narrow**: Keep only links that also match.
 	- `--include` (regex), and every name/wholename glob.
-- **Subtract** - drop links that match.
+
+- **Subtract**: Drop links that match.
 	- `--exclude` (regex).
-- **Widen** - re-admit links from the original scan.
+
+- **Widen**: Re-admit links from the original scan.
 	- `--re-include` (regex), the only widener.
 	- Brings back even a link a previous `--exclude` dropped.
 
@@ -105,10 +110,11 @@ Globs vs regexes:
 - Globs are [`find`](https://man7.org/linux/man-pages/man1/find.1.html)-style.
 	- `*` and `?` span `/`, so `--wholename` behaves like find's `-wholename`.
 	- Quote them so the shell doesn't expand them.
+
 - Regexes are PCRE-level (lookaround, backreferences, inline `(?i)`).
 
-| Flag | Matches
-| :-- | :--
+| Flag                   | Matches
+|:---                    |:---
 | `--inc[lude]=REGEX`    | Keep only links whose path also matches (repeatable; narrows).
 | `--exc[lude]=REGEX`    | Drop links whose path matches (repeatable; subtracts).
 | `--re-inc[lude]=REGEX` | Re-add links matching this from the original scan (repeatable; widens).
@@ -124,16 +130,16 @@ Globs vs regexes:
 
 ### Editing the target
 
-| Flag | Effect
-| :-- | :--
-| `--from=REGEX`  | pattern to match inside each target
-| `--to=TEMPLATE` | replacement; `$1` / `${name}` reference `--from` captures
-| `-F`, `--literal` | treat `--from` as a plain literal, not a regex (replace all occurrences)
+| Flag                  | Effect
+|:---                   |:---
+| `--from=REGEX`        | pattern to match inside each target
+| `--to=TEMPLATE`       | replacement; `$1` / `${name}` reference `--from` captures
+| `-F`, `--literal`     | treat `--from` as a plain literal, not a regex (replace all occurrences)
 | `--renormal-relative` | rewrite each target relative to the link's own directory (usable without `--from`)
 | `--renormal-absolute` | rewrite each target as a cleaned absolute path (usable without `--from`)
-| `-n`, `--dry-run` | preview; write nothing
-| `--confirm`       | preview the whole plan, then prompt once (`y/N`) before writing
-| `-0`, `--print0`  | machine output: one link path per NUL record, no summary (for `xargs -0`)
+| `-n`, `--dry-run`     | preview; write nothing
+| `--confirm`           | preview the whole plan, then prompt once (`y/N`) before writing
+| `-0`, `--print0`      | machine output: one link path per NUL record, no summary (for `xargs -0`)
 
 ## Examples
 
@@ -180,7 +186,7 @@ link-doctor /srv --from='/mnt/old' --to='/mnt/new' --confirm
 
 ## Installing
 
-Grab a prebuilt archive for your platform from the releases, or build from source below. The binary is self-contained with no runtime dependencies.
+Grab a prebuilt archive for your platform from the [releases](https://github.com/jim-collier/link-doctor/releases), or build from source below. The binary is self-contained with no runtime dependencies.
 
 ## Building from source
 

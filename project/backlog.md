@@ -212,6 +212,20 @@ This is a product backlog just for pre-v1.0.0 release. After that, bugs, feature
 			- No demo gif.
 			- No end-of-run line saying what cleanup removed and freed.
 
+- Make release archives rebuild to their published checksums.
+	- ID: 2026102817592630
+	- Type: Enhancement
+	- Status: Queued
+	- Priority [Feature|Enhancement] | Severity [Bug]: Avg
+	- Opened: 20261028-175926
+	- Opened by: JC
+	- Related IDs: 2026102416310508, 2026102416310510, 2026101301161865
+	- Requirements [Feature]:
+		- The cross stage builds whatever is checked out. On `dev` the release tag isn't reachable, so `--version` prints a commit hash. Release archives build from the tag.
+		- Go builds pass `-buildvcs=false` and an empty `-buildid=`, and pin `GOAMD64=v1`.
+		- Archive entries get a fixed mtime, owner, and order, taken from the commit time. Today each build stamps the binary with the build time.
+		- The cross stage writes `SHA256SUMS` beside the archives. v1.0.0-beta.1 has one made by hand.
+
 - Run on the last Core 2 Duo, and AMD CPUs from that era.
 	- ID: 2026101301161865
 	- Type: Enhancement
@@ -229,6 +243,27 @@ This is a product backlog just for pre-v1.0.0 release. After that, bugs, feature
 		- Tests run the release build on an emulated Penryn and Phenom II, through Intel SDE or QEMU's `-cpu Penryn` and `-cpu phenom`.
 	- Progress log:
 		- 20261013: Go builds for plain x86-64 by default (`GOAMD64=v1`), and nothing here sets it, so this may already hold. Pin `GOAMD64=v1` in the release build so a stray environment can't raise it. The standard library already picks faster code at run time.
+
+- Rename to Link Doctor and publish v1.0.0-beta.1.
+	- ID: 2026102817592625
+	- Type: Task
+	- Status: Done
+	- Priority [Feature|Enhancement] | Severity [Bug]: High
+	- Opened: 20261028-175926
+	- Opened by: JC
+	- Requirements [Feature]:
+		- Rename `repoint-symlink` to `link-doctor` everywhere: the GitHub repo, the Go module, the binary, and the docs. The official title is "Link Doctor".
+		- Rename the working folder `./github` to `./repo`.
+		- Merge the old feature branches and start a `dev` branch.
+		- Tag v1.0.0-beta.1 and publish it as a GitHub prerelease, with notes and binaries. The download table has the OS in rows, and x86_64 and ARM64 in columns.
+	- Progress log:
+		- 20261028: The first archives came from `dev`, before the tag was reachable there, and reported a commit hash as their version. They were rebuilt from the tag. Follow-up is 2026102817592630.
+	- Verified: All 6 archives hold the right OS and architecture, and every public download matches `SHA256SUMS`. The Linux and Windows x86_64 binaries print `v1.0.0-beta.1`.
+	- Branch: rename
+	- Commit: d710581
+	- Test case: `cicd/test.bash` passes on the tagged tree, 58 checks.
+	- Acceptance signoff: Self-closed: mechanical.
+	- Closed: 20261028-175926
 
 ## Old format
 
