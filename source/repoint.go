@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	"github.com/dlclark/regexp2"
-	"github.com/jim-collier/repoint-symlink/filter"
+	"github.com/jim-collier/link-doctor/filter"
 )
 
 // renormMode re-normalizes a target after any --from/--to rewrite. It can be

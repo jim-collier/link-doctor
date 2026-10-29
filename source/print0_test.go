@@ -10,7 +10,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jim-collier/repoint-symlink/filter"
+	"github.com/jim-collier/link-doctor/filter"
 )
 
 // captureStdout runs fn with os.Stdout redirected and returns what it printed.

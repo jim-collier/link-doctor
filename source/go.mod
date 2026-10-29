@@ -1,4 +1,4 @@
-module github.com/jim-collier/repoint-symlink
+module github.com/jim-collier/link-doctor
 
 go 1.25.0
 
