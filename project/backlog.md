@@ -32,6 +32,19 @@ This is a product backlog just for pre-v1.0.0 release. After that, bugs, feature
 
 ## Issues
 
+- Update the project to a more comprehensive and standardized CICD process, like recent sister projects.
+	- ID: 2026103010541537
+	- Type: Enhancement
+	- Status: Queued
+	- Needs local test suite run?: Yes
+	- Priority [Feature|Enhancement] | Severity [Bug]: High
+	- Opened: 20261030-105415
+	- Opened by: JC
+	- Related IDs: 2026101303344551, 2026102416310500, 2026102416310501, 2026102416310502, 2026102416310503, 2026102416310504, 2026102416310505, 2026102416310506, 2026102416310507, 2026102416310508, 2026102416310509, 2026102416310510, 2026102817592630
+	- Requirements [Feature]:
+		- Pre-next-cut.
+		- The CICD reset items and the reproducible-build item already cover most of it. This one tracks the whole and closes when they do.
+
 - Build and test in a pinned container.
 	- ID: 2026101303344551
 	- Type: Enhancement
@@ -270,6 +283,21 @@ This is a product backlog just for pre-v1.0.0 release. After that, bugs, feature
 		- The help says plainly that this changes where a link to a link points once the middle link moves, which the logical modes never do.
 		- On a `.lnk`, off Windows, the target is resolved per 2026102819042524 and written back as a rooted backslash path with no drive. On Windows it is written as a drive path.
 		- On Windows, `canon` works on junctions, following further junctions and symlinks and rewriting the reparse buffer in place, which needs no elevation. `rel` on a junction warns and skips, since a junction only holds an absolute target. Symlinks still need the privilege or developer mode, and the help says so.
+
+- Allow a newline or null-delimited list of symlinks to check, via pipe. (E.g. output from flisty.)
+	- ID: 2026103010541532
+	- Type: Feature
+	- Status: Queued
+	- Needs local test suite run?: Yes
+	- Priority [Feature|Enhancement] | Severity [Bug]: Avg
+	- Opened: 20261030-105415
+	- Opened by: JC
+	- Related IDs: 2026102819042523
+	- Target OS: All
+	- Requirements [Feature]:
+		- Pre-next-cut.
+		- Fits the reworked command line in 2026102819042523.
+		- Reading the list is a new parse path, so it gets a fuzz target, per the testing rule in memory.
 
 - Make release archives rebuild to their published checksums.
 	- ID: 2026102817592630
